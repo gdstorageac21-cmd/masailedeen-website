@@ -20,7 +20,10 @@ collections:
       - {label: "Answer (Body)", name: "body", widget: "markdown"}
   - name: "settings"
     label: "Site Settings"
-    file: "src/_data/settings.json"
-    fields:
-      - {label: "Site Title", name: "title", widget: "string"}
-      - {label: "Site Description", name: "description", widget: "text"}
+    files:
+      - label: "Global Settings"
+        name: "global"
+        file: "src/_data/settings.json"
+        fields:
+          - {label: "Site Title", name: "title", widget: "string"}
+          - {label: "Site Description", name: "description", widget: "text"}
