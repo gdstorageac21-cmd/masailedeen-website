@@ -16,7 +16,7 @@ collections:
       - {label: "Category", name: "category", widget: "select", options: ["Fiqh", "Prayer", "Zakat", "Hadith", "Social", "Fasting", "Beliefs", "Other"]}
       - {label: "Publish Date", name: "date", widget: "datetime"}
       - {label: "Summary", name: "summary", widget: "text"}
-      - {label: "Question", name: "question", widget: "text"}
+      - {label: "Question", name: "question", widget: "markdown"}
       - {label: "Answer (Body)", name: "body", widget: "markdown"}
   - name: "settings"
     label: "Site Settings"
