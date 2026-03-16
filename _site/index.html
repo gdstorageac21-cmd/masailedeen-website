@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Masail-e-Deen — Authentic Religious Guidance</title>
+  <meta name="description" content="Get authentic Islamic guidance based on the Quran and Sunnah. Browse thousands of verified fatwas and scholarly answers for your everyday life."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <style>
+    /* ---- Page-specific ---- */
+    body { font-size: 16px; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #00391a 0%, var(--primary) 45%, #046a38 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2l-2 2V0zm0 4l4-4h2l-6 6V4zm0 4l8-8h2L40 10V8zm0 4L52 0h2L40 14v-2zm0 4L56 0h2L40 18v-2zm0 4L60 0h2L40 22v-2zm0 4L64 0h2L40 26v-2zm0 4L68 0h2L40 30v-2zm0 4L72 0h2L40 34v-2zm0 4L76 0h2L40 38v-2zm0 4L80 0v2L42 40h-2zm4 0L80 4v2L46 40h-2zm4 0L80 8v2L50 40h-2zm4 0L80 12v2L54 40h-2zm4 0L80 16v2L58 40h-2zm4 0L80 20v2L62 40h-2zm4 0L80 24v2L66 40h-2zm4 0L80 28v2L70 40h-2zm4 0L80 32v2L74 40h-2zm4 0L80 36v2L78 40h-2zm4 0L80 40v-2h-2z'/%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 2; }
+
+    /* Search box */
+    .search-box {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      padding: 0.4rem 0.4rem 0.4rem 1.25rem;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+      gap: 0.5rem;
+    }
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--on-surface);
+      padding: 0.75rem 0;
+    }
+    .search-box input::placeholder { color: var(--outline); }
+
+    /* Cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+      align-items: start;
+    }
+    @media (max-width: 1024px) { .cards-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; } }
+
+    .card-accent { background: var(--primary-container); }
+    .card-hidden { display: none; }
+
+    /* Category filter pills */
+    .filter-pill {
+      padding: 0.4rem 1rem;
+      border-radius: 99px;
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    /* Stats strip */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 640px) { .stats-strip { grid-template-columns: repeat(2,1fr); } }
+
+    /* Ask-a-Question slide panel */
+    .ask-panel {
+      position: fixed;
+      right: -600px;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface-container-lowest);
+      z-index: 1010;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+      transition: right 0.32s cubic-bezier(.4,0,.2,1);
+      padding: 2.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .ask-panel.open { right: 0; }
+    .ask-panel label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+    .ask-panel input, .ask-panel textarea, .ask-panel select {
+      width: 100%;
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      color: var(--on-surface);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .ask-panel input:focus, .ask-panel textarea:focus, .ask-panel select:focus {
+      border-color: var(--primary);
+    }
+    .ask-panel textarea { min-height: 130px; resize: vertical; }
+
+    /* Floating Ask Btn */
+    #fab-ask {
+      position: fixed;
+      bottom: 5.5rem;
+      right: 2rem;
+      background: var(--secondary);
+      color: var(--on-secondary);
+      border: none;
+      border-radius: 99px;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      z-index: 500;
+      transition: var(--transition);
+    }
+    #fab-ask:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+    /* Insight section */
+    .insight-img-wrap {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .insight-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(60%);
+      transition: filter 0.6s ease;
+    }
+    .insight-img-wrap:hover img { filter: grayscale(0%); }
+
+    /* Footer */
+    footer {
+      background: var(--inverse-surface);
+      color: var(--inverse-on-surface);
+    }
+    footer a { color: var(--outline); text-decoration: none; transition: color 0.18s; }
+    footer a:hover { color: var(--on-primary); }
+
+    /* Dark mode card tweaks */
+    .dark .card-regular { background: var(--surface-container-low); border-color: rgba(255,255,255,0.05); }
+    .dark .search-box { background: var(--surface-container); }
+    .dark .search-box input { color: var(--on-surface); }
+    .dark footer { background: var(--surface-container-lowest); color: var(--on-surface); }
+
+    /* Aniamtion */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.5s ease both; }
+    .fade-up:nth-child(2) { animation-delay: 0.08s; }
+    .fade-up:nth-child(3) { animation-delay: 0.16s; }
+  </style>
+</head>
+<body>
+
+<!-- Reading progress bar (not really used on home, but keep for consistency) -->
+<div id="reading-progress"></div>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav style="position:sticky;top:0;z-index:50;" class="glass-nav">
+  <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:64px;">
+    <!-- Logo + Nav Links -->
+    <div style="display:flex;align-items:center;gap:2.5rem;">
+      <a href="index.html" style="text-decoration:none;color:var(--primary);font-size:1.25rem;font-weight:800;letter-spacing:-0.03em;">Masail-e-Deen</a>
+      <div class="desktop-links" style="display:flex;gap:1.75rem;align-items:center;">
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;transition:color .2s;" class="nav-link" data-cat="Beliefs">Beliefs</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;transition:color .2s;" class="nav-link" data-cat="Prayer">Prayer</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;transition:color .2s;" class="nav-link" data-cat="Fasting">Fasting</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;transition:color .2s;" class="nav-link" data-cat="Zakat">Zakat</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;transition:color .2s;" class="nav-link" data-cat="Hadith">Hadith</a>
+      </div>
+    </div>
+    <!-- Controls -->
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <button id="dark-toggle" title="Toggle dark mode" style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--on-surface-variant);display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='var(--surface-container-high)'" onmouseout="this.style.background='transparent'">
+        <span class="material-symbols-outlined" id="dark-icon">dark_mode</span>
+      </button>
+      <button style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--on-surface-variant);display:flex;align-items:center;justify-content:center;" title="Language">
+        <span class="material-symbols-outlined">language</span>
+      </button>
+      <button id="hamburger" style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--on-surface-variant);display:flex;align-items:center;justify-content:center;display:none;" title="Menu">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#" data-cat="Beliefs">Beliefs</a>
+    <a href="#" data-cat="Prayer">Prayer</a>
+    <a href="#" data-cat="Fasting">Fasting</a>
+    <a href="#" data-cat="Zakat">Zakat</a>
+    <a href="#" data-cat="Hadith">Hadith</a>
+  </div>
+</nav>
+
+<main>
+<!-- ==================== HERO ==================== -->
+<section class="hero" style="padding:6rem 1.5rem 5rem;">
+  <div class="hero-content" style="max-width:900px;margin:0 auto;text-align:center;">
+    <span style="display:inline-block;padding:0.35rem 1.1rem;border-radius:99px;background:var(--secondary-container);color:var(--on-secondary-container);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Authentic Knowledge</span>
+    <h1 style="font-size:clamp(2.4rem,6vw,4.5rem);font-weight:800;color:var(--on-primary);line-height:1.12;margin-bottom:1.25rem;text-wrap:balance;">
+      Find Your Religious <span style="color:var(--secondary-fixed);">Solution</span>
+    </h1>
+    <p style="color:var(--on-primary-container);font-size:1.15rem;max-width:580px;margin:0 auto 2.5rem;opacity:0.9;line-height:1.7;">
+      Get authentic guidance based on the Quran and Sunnah for your everyday life challenges.
+    </p>
+    <!-- Search -->
+    <div class="search-box" style="max-width:680px;margin:0 auto;" id="hero-search-wrap">
+      <span class="material-symbols-outlined" style="color:var(--outline);flex-shrink:0;">search</span>
+      <input type="text" id="search-input" placeholder="Search for Masail (e.g., Zakat calculation, Prayer times…)" autocomplete="off"/>
+      <button class="btn-primary" style="border-radius:var(--radius-md);padding:0.85rem 1.75rem;flex-shrink:0;" onclick="doSearch()">Search</button>
+    </div>
+    <!-- Quick chips -->
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center;margin-top:1.25rem;">
+      <span style="color:var(--on-primary-container);opacity:0.7;font-size:0.8rem;align-self:center;">Popular:</span>
+      <button class="filter-pill" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:white;" onclick="quickSearch('Zakat')">Zakat</button>
+      <button class="filter-pill" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:white;" onclick="quickSearch('Prayer')">Prayer</button>
+      <button class="filter-pill" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:white;" onclick="quickSearch('Fasting')">Fasting</button>
+      <button class="filter-pill" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:white;" onclick="quickSearch('Nikah')">Nikah</button>
+      <button class="filter-pill" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);color:white;" onclick="quickSearch('Halal')">Halal Food</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== LATEST QUESTIONS ==================== -->
+<section style="max-width:1280px;margin:0 auto;padding:5rem 1.5rem;">
+  <!-- Header -->
+  <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+    <div>
+      <h2 style="font-size:2rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;">Latest Questions</h2>
+      <p style="color:var(--on-surface-variant);">Recent inquiries answered by our panel of scholars.</p>
+    </div>
+    <a href="#" style="color:var(--secondary);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:0.25rem;transition:gap .2s;" onmouseover="this.style.gap='0.5rem'" onmouseout="this.style.gap='0.25rem'">
+      View Archive <span class="material-symbols-outlined" style="font-size:1.1rem;">arrow_forward</span>
+    </a>
+  </div>
+
+  <!-- Category Filters -->
+  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:2.5rem;" id="filter-bar">
+    <button class="filter-pill active" data-filter="all" onclick="filterCards('all',this)">All</button>
+    <button class="filter-pill" data-filter="Fiqh" onclick="filterCards('Fiqh',this)">Fiqh</button>
+    <button class="filter-pill" data-filter="Prayer" onclick="filterCards('Prayer',this)">Prayer</button>
+    <button class="filter-pill" data-filter="Zakat" onclick="filterCards('Zakat',this)">Zakat</button>
+    <button class="filter-pill" data-filter="Hadith" onclick="filterCards('Hadith',this)">Hadith</button>
+    <button class="filter-pill" data-filter="Social" onclick="filterCards('Social',this)">Social</button>
+    <button class="filter-pill" data-filter="Fasting" onclick="filterCards('Fasting',this)">Fasting</button>
+  </div>
+
+  <!-- No results msg -->
+  <div id="no-results" style="display:none;text-align:center;padding:3rem;color:var(--on-surface-variant);">
+    <span class="material-symbols-outlined" style="font-size:3rem;display:block;margin-bottom:1rem;opacity:.4;">search_off</span>
+    <p>No results found. Try a different keyword or category.</p>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="cards-grid" id="cards-grid">
+
+    
+
+    
+
+  </div><!-- /cards-grid -->
+</section>
+
+<!-- ==================== SCHOLARLY INSIGHT ==================== -->
+<section style="background:var(--surface-container);padding:5rem 1.5rem;overflow:hidden;">
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;">
+    <!-- Image side -->
+    <div class="insight-img-wrap" style="aspect-ratio:1;box-shadow:var(--shadow-lg);position:relative;">
+      <img src="https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?w=700&q=80" alt="Islamic architecture arches in sunlight"/>
+      <!-- Quote overlay -->
+      <div style="position:absolute;bottom:-1.5rem;right:-1.5rem;background:var(--primary);padding:1.75rem;border-radius:var(--radius-lg);max-width:280px;box-shadow:var(--shadow-md);">
+        <p style="color:var(--on-primary);font-style:italic;line-height:1.55;font-size:0.9rem;">"Knowledge is a light that Allah casts into the heart of whomsoever He wills."</p>
+        <p style="color:var(--secondary-fixed-dim);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-top:0.75rem;">— Imam Malik</p>
+      </div>
+    </div>
+    <!-- Text side -->
+    <div>
+      <h2 style="font-size:2.25rem;font-weight:700;color:var(--primary);margin-bottom:1.25rem;line-height:1.2;">A Modern Manuscript of Guidance</h2>
+      <p style="color:var(--on-surface);font-size:1.05rem;line-height:1.75;margin-bottom:1.5rem;">Masail-e-Deen is dedicated to providing clarified, authentic, and documented answers to contemporary challenges. We bridge the gap between classical Fiqh and modern digital accessibility.</p>
+      <div class="stats-strip" style="margin-bottom:2.5rem;">
+        <div>
+          <span style="display:block;font-size:2rem;font-weight:800;color:var(--secondary);">5000+</span>
+          <span style="color:var(--on-surface-variant);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">Fatwas Archived</span>
+        </div>
+        <div>
+          <span style="display:block;font-size:2rem;font-weight:800;color:var(--secondary);">12</span>
+          <span style="color:var(--on-surface-variant);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">Expert Scholars</span>
+        </div>
+        <div>
+          <span style="display:block;font-size:2rem;font-weight:800;color:var(--secondary);">48h</span>
+          <span style="color:var(--on-surface-variant);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">Response Time</span>
+        </div>
+        <div>
+          <span style="display:block;font-size:2rem;font-weight:800;color:var(--secondary);">20+</span>
+          <span style="color:var(--on-surface-variant);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">Languages</span>
+        </div>
+      </div>
+      <button class="btn-primary" style="font-size:1rem;padding:0.9rem 2rem;">
+        <span class="material-symbols-outlined">info</span> Learn About Our Method
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== NEWSLETTER STRIP ==================== -->
+<section style="background:linear-gradient(135deg,var(--primary) 0%,#046a38 100%);padding:4rem 1.5rem;text-align:center;">
+  <div style="max-width:600px;margin:0 auto;">
+    <span class="material-symbols-outlined" style="font-size:2.5rem;color:var(--secondary-fixed);display:block;margin-bottom:1rem;">notifications_active</span>
+    <h2 style="font-size:1.75rem;font-weight:700;color:var(--on-primary);margin-bottom:0.75rem;">Stay Updated Weekly</h2>
+    <p style="color:var(--on-primary-container);margin-bottom:2rem;">Get the latest fatwas and spiritual insights delivered directly to your inbox every Friday.</p>
+    <div style="display:flex;gap:0.75rem;max-width:440px;margin:0 auto;">
+      <input class="newsletter-input" type="email" placeholder="Your email address" style="flex:1;background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:white;" id="footer-email"/>
+      <button class="btn-primary" style="background:var(--secondary-fixed);color:var(--on-secondary-fixed);flex-shrink:0;padding:0.75rem 1.25rem;" onclick="subscribeNewsletter('footer-email')">Subscribe</button>
+    </div>
+    <p style="color:var(--on-primary-container);font-size:0.8rem;margin-top:1rem;opacity:0.7;">No spam. Unsubscribe at any time.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer style="padding:4rem 1.5rem 2rem;">
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:3rem;margin-bottom:3rem;">
+    <!-- Brand -->
+    <div>
+      <span style="font-size:1.4rem;font-weight:800;color:var(--on-primary-container);display:block;margin-bottom:1rem;">Masail-e-Deen</span>
+      <p style="color:var(--outline);font-size:0.9rem;line-height:1.7;max-width:280px;">Your trusted companion for navigating religious obligations in the modern world. Verified by the Council of Scholars.</p>
+      <div style="display:flex;gap:0.75rem;margin-top:1.5rem;">
+        <a href="#" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='var(--primary)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+          <span class="material-symbols-outlined" style="font-size:1.1rem;">public</span>
+        </a>
+        <a href="#" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='var(--primary)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+          <span class="material-symbols-outlined" style="font-size:1.1rem;">mail</span>
+        </a>
+        <a href="#" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='var(--primary)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+          <span class="material-symbols-outlined" style="font-size:1.1rem;">rss_feed</span>
+        </a>
+      </div>
+    </div>
+    <!-- Explore -->
+    <div>
+      <h4 style="font-weight:700;color:var(--on-primary);margin-bottom:1.25rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.06em;">Explore</h4>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:0.85rem;">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Scholar Panel</a></li>
+        <li><a href="#">Ask a Question</a></li>
+        <li><a href="#">Categories</a></li>
+      </ul>
+    </div>
+    <!-- Legal -->
+    <div>
+      <h4 style="font-weight:700;color:var(--on-primary);margin-bottom:1.25rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.06em;">Legal</h4>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:0.85rem;">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Disclaimer</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <!-- Newsletter -->
+    <div>
+      <h4 style="font-weight:700;color:var(--on-primary);margin-bottom:1.25rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.06em;">Stay Updated</h4>
+      <p style="color:var(--outline);font-size:0.85rem;margin-bottom:1rem;">Subscribe to our weekly insight newsletter.</p>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <input class="newsletter-input" type="email" placeholder="Email address" id="footer2-email"/>
+        <button class="btn-primary" style="justify-content:center;" onclick="subscribeNewsletter('footer2-email')">
+          <span class="material-symbols-outlined">send</span> Subscribe
+        </button>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1280px;margin:0 auto;border-top:1px solid rgba(255,255,255,0.07);padding-top:1.75rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <span style="color:var(--outline);font-size:0.85rem;">© 2024 Masail-e-Deen. All rights reserved.</span>
+    <span style="color:var(--outline);font-size:0.85rem;">Built with authentic scholarship &amp; modern design</span>
+  </div>
+</footer>
+
+<!-- ==================== FLOATING WIDGETS ==================== -->
+<!-- FAB Ask -->
+<button id="fab-ask" onclick="openAskPanel()">
+  <span class="material-symbols-outlined">edit_note</span> Ask a Question
+</button>
+
+<!-- Back to Top -->
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+  <span class="material-symbols-outlined">arrow_upward</span>
+</button>
+
+<!-- ==================== ASK A QUESTION PANEL ==================== -->
+<div id="panel-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1005;opacity:0;pointer-events:none;transition:opacity .3s;" onclick="closeAskPanel()"></div>
+<div class="ask-panel" id="ask-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+    <h2 style="font-size:1.4rem;font-weight:700;color:var(--primary);">Ask a Question</h2>
+    <button onclick="closeAskPanel()" style="border:none;background:none;cursor:pointer;color:var(--on-surface-variant);padding:0.25rem;">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+  <p style="color:var(--on-surface-variant);font-size:0.9rem;margin-bottom:0.5rem;">Submit your question and receive a scholarly response within 48 hours.</p>
+  <hr style="border-color:var(--outline-variant);"/>
+  <div>
+    <label>Your Name</label>
+    <input type="text" placeholder="e.g. Muhammad Ali"/>
+  </div>
+  <div>
+    <label>Email Address</label>
+    <input type="email" placeholder="your@email.com"/>
+  </div>
+  <div>
+    <label>Category</label>
+    <select>
+      <option>Select a category…</option>
+      <option>Beliefs (Aqeedah)</option>
+      <option>Prayer (Salah)</option>
+      <option>Fasting (Sawm)</option>
+      <option>Zakat</option>
+      <option>Hajj & Umrah</option>
+      <option>Marriage & Family</option>
+      <option>Finance & Business</option>
+      <option>Social Issues</option>
+      <option>Hadith Verification</option>
+      <option>Other</option>
+    </select>
+  </div>
+  <div>
+    <label>Your Question</label>
+    <textarea placeholder="Please describe your question in detail. Include context and any relevant background information…"></textarea>
+  </div>
+  <label style="display:flex;align-items:flex-start;gap:0.6rem;font-weight:400;color:var(--on-surface-variant);font-size:0.85rem;cursor:pointer;">
+    <input type="checkbox" style="width:auto;margin-top:2px;accent-color:var(--primary);"/> 
+    I confirm my question is sincere and I accept the site's terms.
+  </label>
+  <button class="btn-primary" style="width:100%;justify-content:center;" onclick="submitQuestion(this)">
+    <span class="material-symbols-outlined">send</span> Submit Question
+  </button>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+  /* --- Dark Mode --- */
+  const html = document.documentElement;
+  const darkToggle = document.getElementById('dark-toggle');
+  const darkIcon = document.getElementById('dark-icon');
+  if (localStorage.getItem('theme') === 'dark') { html.classList.add('dark'); darkIcon.textContent = 'light_mode'; }
+
+  darkToggle.addEventListener('click', () => {
+    html.classList.toggle('dark');
+    const isDark = html.classList.contains('dark');
+    darkIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+
+  /* --- Back to Top --- */
+  const btt = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    btt.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  /* --- Hamburger --- */
+  const ham = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const desktopLinks = document.querySelector('.desktop-links');
+  function checkBreakpoint() {
+    const isMobile = window.innerWidth < 768;
+    ham.style.display = isMobile ? 'flex' : 'none';
+    if (desktopLinks) desktopLinks.style.display = isMobile ? 'none' : 'flex';
+  }
+  checkBreakpoint();
+  window.addEventListener('resize', checkBreakpoint);
+  ham.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+
+  /* --- Ask Panel --- */
+  const askPanel = document.getElementById('ask-panel');
+  const panelOverlay = document.getElementById('panel-overlay');
+  function openAskPanel() {
+    askPanel.classList.add('open');
+    panelOverlay.style.opacity = '1';
+    panelOverlay.style.pointerEvents = 'all';
+  }
+  function closeAskPanel() {
+    askPanel.classList.remove('open');
+    panelOverlay.style.opacity = '0';
+    panelOverlay.style.pointerEvents = 'none';
+  }
+  function submitQuestion(btn) {
+    btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Submitted!';
+    btn.style.background = '#046a38';
+    setTimeout(closeAskPanel, 1500);
+  }
+
+  /* --- Live Search (hero input) --- */
+  const searchInput = document.getElementById('search-input');
+  searchInput.addEventListener('input', () => applyFilters());
+
+  function doSearch() { applyFilters(); document.getElementById('cards-grid').scrollIntoView({behavior:'smooth',block:'start'}); }
+  function quickSearch(q) { searchInput.value = q; applyFilters(); document.getElementById('cards-grid').scrollIntoView({behavior:'smooth',block:'start'}); }
+
+  /* --- Category Filter --- */
+  let currentFilter = 'all';
+  function filterCards(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const q = searchInput.value.trim().toLowerCase();
+    const cards = document.querySelectorAll('#cards-grid > div[data-category]');
+    let visible = 0;
+    cards.forEach(card => {
+      const cat = card.dataset.category;
+      const title = (card.dataset.title || '').toLowerCase();
+      const text = (card.innerText || '').toLowerCase();
+      const catMatch = currentFilter === 'all' || cat === currentFilter || cat === '__all__';
+      const qMatch = !q || title.includes(q) || text.includes(q);
+      const show = catMatch && qMatch;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  /* --- Newsletter subscribe --- */
+  function subscribeNewsletter(inputId) {
+    const el = document.getElementById(inputId);
+    if (!el.value || !el.value.includes('@')) { el.style.borderColor = 'var(--error)'; return; }
+    el.style.borderColor = 'var(--primary)';
+    el.value = '';
+    el.placeholder = '✓ Subscribed! Thank you.';
+    setTimeout(() => { el.placeholder = 'Your email address'; }, 3000);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fatwa: {{ title }} — Masail-e-Deen</title>
+  <meta name="description" content="{{ summary }}"/>
+
+  <!-- Google Analytics Placeholder -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <style>
+    body { font-size: 16px; }
+
+    /* 12-col layout */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .sidebar { padding-top: 0; }
+    }
+
+    /* Sticky sidebar */
+    .sidebar { position: sticky; top: 80px; }
+
+    /* Question block */
+    .question-block {
+      background: color-mix(in srgb, var(--primary-fixed) 12%, transparent);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Answer block */
+    .answer-block {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+    }
+    .dark .answer-block { background: var(--surface-container-low); }
+
+    /* Scholar card */
+    .scholar-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      color: var(--on-primary);
+    }
+
+    /* Related fatwa cards */
+    .related-card {
+      display: block;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      background: var(--surface-container-low);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .related-card:hover {
+      background: var(--surface-container-lowest);
+      border-color: var(--outline-variant);
+      transform: translateX(4px);
+    }
+    .dark .related-card { background: var(--surface-container); }
+    .dark .related-card:hover { background: var(--surface-container-high); }
+
+    /* TOC */
+    .toc-list { display: flex; flex-direction: column; gap: 0.2rem; }
+
+    /* Key summary box */
+    .key-summary {
+      background: var(--surface-container-low);
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1.5rem 1.75rem;
+      margin: 1.75rem 0;
+    }
+    .dark .key-summary { background: var(--surface-container); }
+    .key-summary li { margin-bottom: 0.5rem; color: var(--on-surface-variant); }
+
+    /* Footer */
+    footer { background: var(--inverse-surface); color: var(--inverse-on-surface); }
+    footer a { color: var(--outline); text-decoration: none; transition: color 0.18s; }
+    footer a:hover { color: white; }
+
+    /* Dark mode adjustments */
+    .dark .question-block { background: color-mix(in srgb, var(--primary) 14%, transparent); }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.4s ease both; }
+  </style>
+</head>
+<body>
+
+<!-- Reading Progress Bar -->
+<div id="reading-progress"></div>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav style="position:sticky;top:0;z-index:50;" class="glass-nav">
+  <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:64px;">
+    <div style="display:flex;align-items:center;gap:2.5rem;">
+      <a href="index.html" style="text-decoration:none;color:var(--primary);font-size:1.25rem;font-weight:800;letter-spacing:-0.03em;">Masail-e-Deen</a>
+      <div class="desktop-links" style="display:flex;gap:1.75rem;align-items:center;">
+        <a href="index.html" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;">Home</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;">Prayer</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;">Fasting</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;">Zakat</a>
+        <a href="#" style="color:var(--on-surface-variant);text-decoration:none;font-weight:500;">Hadith</a>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <button id="dark-toggle" title="Toggle dark mode" style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--on-surface-variant);display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined" id="dark-icon">dark_mode</span>
+      </button>
+      <button style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--on-surface-variant);display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined">language</span>
+      </button>
+      <button id="hamburger" style="display:none;width:40px;height:40px;border-radius:50%;border:none;background:transparent;cursor:pointer;color:var(--on-surface-variant);align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="#">Prayer</a><a href="#">Fasting</a><a href="#">Zakat</a><a href="#">Hadith</a>
+  </div>
+</nav>
+
+<main style="max-width:1280px;margin:0 auto;padding:2.5rem 1.5rem 4rem;">
+
+  <!-- ==================== BREADCRUMB + ACTION BAR ==================== -->
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:2.5rem;">
+    <!-- Breadcrumb -->
+    <nav style="display:flex;align-items:center;gap:0.35rem;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--on-surface-variant);">
+      <a href="index.html" style="color:inherit;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--on-surface-variant)'">Home</a>
+      <span class="material-symbols-outlined" style="font-size:0.9rem;">chevron_right</span>
+      <a href="#" style="color:inherit;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--on-surface-variant)'">Prayer</a>
+      <span class="material-symbols-outlined" style="font-size:0.9rem;">chevron_right</span>
+      <span style="color:var(--on-surface);">Fatwa Details</span>
+    </nav>
+    <!-- Action bar -->
+    <div style="display:flex;align-items:center;gap:0.6rem;" class="no-print">
+      <!-- Reader controls -->
+      <div class="reader-controls">
+        <span style="font-size:0.75rem;color:var(--on-surface-variant);font-weight:600;">Aa</span>
+        <button class="font-btn" id="font-dec" title="Decrease font size">A−</button>
+        <button class="font-btn" id="font-inc" title="Increase font size">A+</button>
+      </div>
+      <button onclick="window.print()" style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--surface-container-lowest);border:1px solid var(--outline-variant);border-radius:var(--radius-sm);color:var(--primary);font-family:'Inter',sans-serif;font-weight:500;font-size:0.85rem;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--surface-container)'" onmouseout="this.style.background='var(--surface-container-lowest)'">
+        <span class="material-symbols-outlined" style="font-size:1.1rem;">print</span> Print
+      </button>
+      <button onclick="openShareModal()" style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--primary);border:none;border-radius:var(--radius-sm);color:var(--on-primary);font-family:'Inter',sans-serif;font-weight:500;font-size:0.85rem;cursor:pointer;transition:background .2s;">
+        <span class="material-symbols-outlined" style="font-size:1.1rem;">share</span> Share
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN + SIDEBAR GRID ==================== -->
+  <div class="detail-grid">
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div>
+      <!-- Fatwa Header -->
+      <header style="margin-bottom:2rem;" class="fade-up">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+          <span style="background:var(--surface-container-highest);color:var(--on-secondary-fixed-variant);padding:0.3rem 0.85rem;border-radius:99px;font-size:0.72rem;font-weight:700;" class="scholarly-chip">{{ category }}</span>
+          <span style="color:var(--on-surface-variant);font-size:0.82rem;border-left:1px solid var(--outline-variant);padding-left:0.75rem;">Fatwa ID: #M-{{ date | date: "%Y%m%d" }}</span>
+          <span style="color:var(--on-surface-variant);font-size:0.82rem;border-left:1px solid var(--outline-variant);padding-left:0.75rem;">{{ date | date: "%b %d, %Y" }}</span>
+          <span style="color:var(--on-surface-variant);font-size:0.82rem;border-left:1px solid var(--outline-variant);padding-left:0.75rem;display:flex;align-items:center;gap:0.25rem;">
+            <span class="material-symbols-outlined" style="font-size:0.9rem;">schedule</span> 5 min read
+          </span>
+        </div>
+        <h1 id="heading-main" style="font-size:clamp(1.5rem,3vw,2rem);font-weight:700;color:var(--on-surface);line-height:1.35;" class="text-balance">
+          {{ title }}
+        </h1>
+      </header>
+
+      <!-- ===== QUESTION ===== -->
+      <section class="question-block fade-up" id="sec-question">
+        <h2 style="color:var(--primary);font-weight:700;font-size:1.05rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+          <span class="material-symbols-outlined">help</span> Question
+        </h2>
+        <p style="font-weight:600;color:var(--on-surface);line-height:1.75;font-size:1rem;">
+          {{ question }}
+        </p>
+      </section>
+
+      <!-- ===== ANSWER ===== -->
+      <section class="answer-block fade-up" id="sec-answer">
+        <h2 style="color:var(--secondary);font-weight:700;font-size:1.05rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;">
+          <span class="material-symbols-outlined">menu_book</span> The Scholarly Verdict
+        </h2>
+
+        <div id="answer-body" style="line-height:1.85;color:var(--on-surface);">
+          {{ content }}
+
+          <!-- Helpful Rating -->
+          <div style="margin-top:2.5rem;padding-top:1.75rem;border-top:1px solid var(--outline-variant);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;">
+            <p style="color:var(--on-surface-variant);font-weight:500;">Was this fatwa helpful?</p>
+            <div style="display:flex;gap:0.6rem;">
+              <button id="thumb-up" class="thumb-btn" onclick="vote('up')" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1.25rem;border-radius:99px;background:var(--surface-container);border:1px solid var(--outline-variant);color:var(--on-surface);font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;transition:all .2s;">
+                <span class="material-symbols-outlined" style="font-size:1.1rem;">thumb_up</span> Yes
+              </button>
+              <button id="thumb-down" class="thumb-btn" onclick="vote('down')" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1.25rem;border-radius:99px;background:var(--surface-container);border:1px solid var(--outline-variant);color:var(--on-surface);font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;transition:all .2s;">
+                <span class="material-symbols-outlined" style="font-size:1.1rem;">thumb_down</span> No
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /answer-body -->
+      </section>
+    </div><!-- /main -->
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar no-print">
+
+      <!-- Table of Contents -->
+      <div style="background:var(--surface-container-low);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.75rem;border:1px solid var(--outline-variant);">
+        <h3 style="font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--on-surface-variant);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+          <span class="material-symbols-outlined" style="font-size:1rem;">toc</span> Contents
+        </h3>
+        <div class="toc-list" id="toc-list">
+          <a href="#sec-question" class="toc-item active">The Question</a>
+          <a href="#sec-answer" class="toc-item">Scholarly Verdict</a>
+          <a href="#sec-validity" class="toc-item">Validity of Prayer</a>
+          <a href="#sec-definition" class="toc-item">Excessive Movement</a>
+          <a href="#sec-summary" class="toc-item">Key Summary</a>
+          <a href="#sec-references" class="toc-item">References</a>
+        </div>
+      </div>
+
+      <!-- Scholar Profile -->
+      <div class="scholar-card" style="margin-bottom:1.75rem;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+          <div style="width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--primary-fixed);">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80" alt="Scholar Portrait" style="width:100%;height:100%;object-fit:cover;"/>
+          </div>
+          <div>
+            <p style="font-weight:700;color:var(--primary-fixed);font-size:1rem;">Mufti Ahmed Ibrahim</p>
+            <p style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;opacity:0.8;">Darul Ifta Department</p>
+          </div>
+        </div>
+        <p style="font-size:0.875rem;line-height:1.65;opacity:0.88;margin-bottom:1.25rem;">Specialized in Fiqh of Worship and Contemporary Financial Transactions. Graduate of Al-Azhar University, Cairo.</p>
+        <button onclick="openAskModal()" style="width:100%;padding:0.75rem;background:var(--secondary-fixed);color:var(--on-secondary-fixed);font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:background .2s;" onmouseover="this.style.background='var(--secondary-container)'" onmouseout="this.style.background='var(--secondary-fixed)'">
+          Ask a Question
+        </button>
+      </div>
+
+      <!-- Related Fatwas -->
+      <div style="margin-bottom:1.75rem;">
+        <h3 style="font-weight:700;color:var(--on-surface);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;font-size:1rem;">
+          Related Fatwas
+          <span style="width:40px;height:2px;background:var(--secondary-fixed-dim);display:block;"></span>
+        </h3>
+        <div style="display:flex;flex-direction:column;gap:0.6rem;">
+          <a href="fatwa.html" class="related-card">
+            <p style="font-size:0.7rem;color:var(--secondary);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;" class="scholarly-chip">Prayer</p>
+            <p style="color:var(--on-surface);font-weight:600;font-size:0.9rem;line-height:1.35;">Ruling on praying while holding a small child.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;">
+              <span style="font-size:0.75rem;color:var(--outline);">12 Oct 2024</span>
+              <span class="material-symbols-outlined" style="font-size:1rem;color:var(--outline);">arrow_forward</span>
+            </div>
+          </a>
+          <a href="fatwa.html" class="related-card">
+            <p style="font-size:0.7rem;color:var(--secondary);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;" class="scholarly-chip">Prayer</p>
+            <p style="color:var(--on-surface);font-weight:600;font-size:0.9rem;line-height:1.35;">Does bleeding from a small wound break the Wudu?</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;">
+              <span style="font-size:0.75rem;color:var(--outline);">08 Oct 2024</span>
+              <span class="material-symbols-outlined" style="font-size:1rem;color:var(--outline);">arrow_forward</span>
+            </div>
+          </a>
+          <a href="fatwa.html" class="related-card">
+            <p style="font-size:0.7rem;color:var(--secondary);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;" class="scholarly-chip">Fiqh</p>
+            <p style="color:var(--on-surface);font-weight:600;font-size:0.9rem;line-height:1.35;">The definition of 'excessive movement' in Salah.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;">
+              <span style="font-size:0.75rem;color:var(--outline);">25 Sep 2024</span>
+              <span class="material-symbols-outlined" style="font-size:1rem;color:var(--outline);">arrow_forward</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div style="background:var(--surface-container-high);border-radius:var(--radius-lg);padding:1.5rem;">
+        <span class="material-symbols-outlined" style="color:var(--primary);font-size:2rem;display:block;margin-bottom:0.75rem;">mail</span>
+        <h4 style="font-weight:700;color:var(--on-surface);margin-bottom:0.5rem;">Weekly Guidance</h4>
+        <p style="font-size:0.85rem;color:var(--on-surface-variant);margin-bottom:1.25rem;line-height:1.6;">Get the latest fatwas and spiritual insights delivered to your inbox.</p>
+        <input class="newsletter-input" type="email" placeholder="Your email address" id="sidebar-email" style="margin-bottom:0.6rem;"/>
+        <button class="btn-primary" style="width:100%;justify-content:center;" onclick="subscribeSidebar()">
+          <span class="material-symbols-outlined">send</span> Subscribe
+        </button>
+      </div>
+
+    </aside>
+  </div>
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer style="padding:3.5rem 1.5rem 2rem;" class="no-print">
+  <div style="max-width:1280px;margin:0 auto;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:2.5rem;margin-bottom:2.5rem;">
+      <div style="max-width:320px;">
+        <span style="font-size:1.4rem;font-weight:800;color:var(--primary-fixed);display:block;margin-bottom:0.85rem;">Masail-e-Deen</span>
+        <p style="color:var(--outline);font-size:0.88rem;line-height:1.7;">Providing authentic scholarly guidance on contemporary and traditional Islamic matters for the global community.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:2.5rem;">
+        <a href="index.html">Home</a>
+        <a href="#">About Us</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:1.5rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;">
+      <p style="color:var(--outline);font-size:0.82rem;">© 2024 Masail-e-Deen. All rights reserved.</p>
+      <div style="display:flex;gap:1rem;">
+        <span class="material-symbols-outlined" style="cursor:pointer;color:var(--outline);transition:color .2s;" onmouseover="this.style.color='var(--secondary-fixed)'" onmouseout="this.style.color='var(--outline)'">public</span>
+        <span class="material-symbols-outlined" style="cursor:pointer;color:var(--outline);transition:color .2s;" onmouseover="this.style.color='var(--secondary-fixed)'" onmouseout="this.style.color='var(--outline)'">language</span>
+        <span class="material-symbols-outlined" style="cursor:pointer;color:var(--outline);transition:color .2s;" onmouseover="this.style.color='var(--secondary-fixed)'" onmouseout="this.style.color='var(--outline)'">mail</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== BACK TO TOP ==================== -->
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+  <span class="material-symbols-outlined">arrow_upward</span>
+</button>
+
+<!-- ==================== SHARE MODAL ==================== -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+      <h3 style="font-size:1.2rem;font-weight:700;color:var(--on-surface);">Share this Fatwa</h3>
+      <button onclick="closeShareModal()" style="border:none;background:none;cursor:pointer;color:var(--on-surface-variant);">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <!-- Copy link -->
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+      <input id="share-url" type="text" value="" readonly style="flex:1;background:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:var(--radius-sm);padding:0.65rem 0.85rem;color:var(--on-surface);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;"/>
+      <button onclick="copyLink()" style="padding:0.65rem 1rem;background:var(--primary);color:var(--on-primary);border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:0.85rem;white-space:nowrap;transition:opacity .2s;" id="copy-btn">
+        <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span>
+      </button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.6rem;">
+      <button class="share-btn" onclick="shareWhatsApp()">
+        <span class="material-symbols-outlined" style="color:#25D366;">chat</span>
+        Share on WhatsApp
+      </button>
+      <button class="share-btn" onclick="shareTwitter()">
+        <span class="material-symbols-outlined" style="color:#1DA1F2;">tag</span>
+        Share on Twitter / X
+      </button>
+      <button class="share-btn" onclick="shareFacebook()">
+        <span class="material-symbols-outlined" style="color:#4267B2;">thumb_up</span>
+        Share on Facebook
+      </button>
+      <button class="share-btn" onclick="shareEmail()">
+        <span class="material-symbols-outlined" style="color:var(--primary);">mail</span>
+        Share via Email
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ASK QUESTION MODAL ==================== -->
+<div class="modal-overlay" id="ask-modal">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <h3 style="font-size:1.2rem;font-weight:700;color:var(--primary);">Ask a Question</h3>
+      <button onclick="closeAskModal()" style="border:none;background:none;cursor:pointer;color:var(--on-surface-variant);">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <p style="color:var(--on-surface-variant);font-size:0.875rem;margin-bottom:1.25rem;">Your question will be answered by <strong>Mufti Ahmed Ibrahim</strong> within 48 hours.</p>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div>
+        <label style="font-size:0.8rem;font-weight:600;color:var(--on-surface-variant);display:block;margin-bottom:0.3rem;">Your Name</label>
+        <input type="text" placeholder="e.g. Muhammad Ali" class="newsletter-input"/>
+      </div>
+      <div>
+        <label style="font-size:0.8rem;font-weight:600;color:var(--on-surface-variant);display:block;margin-bottom:0.3rem;">Email Address</label>
+        <input type="email" placeholder="your@email.com" class="newsletter-input"/>
+      </div>
+      <div>
+        <label style="font-size:0.8rem;font-weight:600;color:var(--on-surface-variant);display:block;margin-bottom:0.3rem;">Your Question</label>
+        <textarea class="newsletter-input" rows="4" placeholder="Describe your question in detail…" style="resize:vertical;"></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;" onclick="submitAsk(this)">
+        <span class="material-symbols-outlined">send</span> Submit Question
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+  /* --- Dark Mode --- */
+  const html = document.documentElement;
+  if (localStorage.getItem('theme') === 'dark') { html.classList.add('dark'); }
+  document.getElementById('dark-icon').textContent = html.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+  document.getElementById('dark-toggle').addEventListener('click', () => {
+    html.classList.toggle('dark');
+    const isDark = html.classList.contains('dark');
+    document.getElementById('dark-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+
+  /* --- Reading Progress Bar --- */
+  const progressBar = document.getElementById('reading-progress');
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop;
+    const total = doc.scrollHeight - doc.clientHeight;
+    progressBar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+
+    /* Back to top */
+    document.getElementById('back-to-top').classList.toggle('visible', scrolled > 400);
+
+    /* TOC active highlight */
+    highlightTOC();
+  });
+
+  /* --- TOC Highlight --- */
+  const tocLinks = document.querySelectorAll('.toc-item');
+  const sections = ['sec-question','sec-answer','sec-validity','sec-definition','sec-summary','sec-references'];
+  function highlightTOC() {
+    let active = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 120) active = id;
+    });
+    tocLinks.forEach(l => {
+      const href = l.getAttribute('href').replace('#','');
+      l.classList.toggle('active', href === active);
+    });
+  }
+
+  /* --- Font Size Controls --- */
+  let fontSize = 16;
+  const answerBody = document.getElementById('answer-body');
+  document.getElementById('font-dec').addEventListener('click', () => {
+    fontSize = Math.max(13, fontSize - 1);
+    answerBody.style.fontSize = fontSize + 'px';
+  });
+  document.getElementById('font-inc').addEventListener('click', () => {
+    fontSize = Math.min(22, fontSize + 1);
+    answerBody.style.fontSize = fontSize + 'px';
+  });
+
+  /* --- Back to Top --- */
+  // handled in scroll event above
+
+  /* --- Hamburger --- */
+  const ham = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const desktopLinks = document.querySelector('.desktop-links');
+  function checkBP() {
+    const m = window.innerWidth < 768;
+    ham.style.display = m ? 'flex' : 'none';
+    if (desktopLinks) desktopLinks.style.display = m ? 'none' : 'flex';
+  }
+  checkBP();
+  window.addEventListener('resize', checkBP);
+  ham.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+
+  /* --- Vote (thumbs) --- */
+  function vote(type) {
+    const up = document.getElementById('thumb-up');
+    const down = document.getElementById('thumb-down');
+    up.classList.remove('liked'); down.classList.remove('disliked');
+    up.style.cssText = ''; down.style.cssText = '';
+    if (type === 'up') {
+      up.style.background = 'var(--primary)'; up.style.color = 'var(--on-primary)'; up.style.borderColor = 'var(--primary)';
+    } else {
+      down.style.background = 'var(--error)'; down.style.color = 'var(--on-error)'; down.style.borderColor = 'var(--error)';
+    }
+  }
+
+  /* --- Share Modal --- */
+  const shareModal = document.getElementById('share-modal');
+  function openShareModal() {
+    document.getElementById('share-url').value = window.location.href;
+    shareModal.classList.add('open');
+  }
+  function closeShareModal() { shareModal.classList.remove('open'); }
+  shareModal.addEventListener('click', e => { if (e.target === shareModal) closeShareModal(); });
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">check</span>';
+      btn.style.background = '#046a38';
+      setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span>'; btn.style.background = ''; }, 2000);
+    });
+  }
+  function shareWhatsApp() { window.open('https://wa.me/?text=' + encodeURIComponent(document.title + ' ' + window.location.href)); }
+  function shareTwitter() { window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(document.title) + '&url=' + encodeURIComponent(window.location.href)); }
+  function shareFacebook() { window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href)); }
+  function shareEmail() { window.location.href = 'mailto:?subject=' + encodeURIComponent(document.title) + '&body=' + encodeURIComponent(window.location.href); }
+
+  /* --- Ask Modal --- */
+  const askModal = document.getElementById('ask-modal');
+  function openAskModal() { askModal.classList.add('open'); }
+  function closeAskModal() { askModal.classList.remove('open'); }
+  askModal.addEventListener('click', e => { if (e.target === askModal) closeAskModal(); });
+  function submitAsk(btn) {
+    btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Submitted!';
+    btn.style.background = '#046a38';
+    setTimeout(closeAskModal, 1500);
+  }
+
+  /* --- Newsletter Sidebar --- */
+  function subscribeSidebar() {
+    const el = document.getElementById('sidebar-email');
+    if (!el.value.includes('@')) { el.style.borderColor = 'var(--error)'; return; }
+    el.value = '';
+    el.placeholder = '✓ Subscribed!';
+    setTimeout(() => el.placeholder = 'Your email address', 3000);
+  }
+</script>
+</body>
+</html>
